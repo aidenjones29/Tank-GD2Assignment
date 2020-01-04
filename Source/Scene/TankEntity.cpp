@@ -46,7 +46,7 @@ extern CMessenger Messenger;
 // Will be needed to implement the required tank behaviour in the Update function below
 extern TEntityUID GetTankUID( int team );
 
-
+float pointToPoint(CVector3 pt1, CVector3 pt2);
 
 /*-----------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------
@@ -79,8 +79,11 @@ CTankEntity::CTankEntity
 	m_Timer = 0.0f;
 	m_patrolPoint[0] = position;
 	m_patrolPoint[1] = position;
-	m_patrolPoint[0].z += 10;
-	m_patrolPoint[1].z -= 10;
+	m_patrolPoint[0].z += 50;
+	m_patrolPoint[1].z -= 50;
+	m_patrolPoint[0].x += 50;
+	m_patrolPoint[1].x -= 50;
+	m_currentPoint = 0;
 }
 
 
@@ -110,13 +113,48 @@ bool CTankEntity::Update( TFloat32 updateTime )
 	// Only move if in Go state
 	if (m_State == Patrol)
 	{
-		// Cycle speed up and down using a sine wave - just demonstration behaviour
-		//**** Variations on this sine wave code does not count as patrolling - for the
-		//**** assignment the tank must move naturally between two specific points
-		m_Speed = 10.0f * Sin( m_Timer * 4.0f );
-		m_Timer += updateTime;
-		
+		//m_Speed = 10.0f * Sin( m_Timer * 4.0f );
+		//m_Timer += updateTime;
+		CVector3 tankPos = Matrix().GetPosition();
 
+		float distance = pointToPoint(tankPos, m_patrolPoint[m_currentPoint]);
+
+		if (distance >= 20.0f)
+		{
+			CVector3 turnVec = tankPos - m_patrolPoint[m_currentPoint];
+			CVector3 tankFacing = Matrix().ZAxis();
+			CVector3 tankXVec = Matrix().XAxis();
+
+			//float length1 = Length(tankFacing);
+			//float length2 = Length(turnVec);
+			//float dotAngle = Dot(turnVec, tankFacing);
+			//float angle = acos(dotAngle / (length1 * length2));
+			//angle = angle * (180/ 3.14159265359);
+
+			//if (angle > 10.0f && angle < 170.0f)
+			//{
+			if (Dot(tankXVec, m_patrolPoint[m_currentPoint]) >= 0)
+			{
+				Matrix().RotateLocalY(10.0f * updateTime);
+			}
+			else if (Dot(tankXVec, m_patrolPoint[m_currentPoint]) <= 0)
+			{
+				Matrix().RotateLocalY(-10.0f * updateTime);
+			}
+			//}
+			m_Speed = 20.0f;
+		}
+		else
+		{
+			if (m_currentPoint == 1)
+			{
+				m_currentPoint = 0;
+			}
+			else
+			{
+				m_currentPoint = 1;
+			}
+		}
 	}
 	else 
 	{
@@ -128,6 +166,12 @@ bool CTankEntity::Update( TFloat32 updateTime )
 	Matrix().MoveLocalZ( m_Speed * updateTime );
 
 	return true; // Don't destroy the entity
+}
+
+float pointToPoint(CVector3 pt1, CVector3 pt2)
+{
+	CVector3 v = pt2 - pt1;
+	return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
 }
 
 
