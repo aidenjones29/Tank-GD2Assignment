@@ -188,6 +188,7 @@ private:
 	TInt32   m_HP;    // Current hit points for the tank
 	int m_currentPoint;
 	CVector3 m_patrolPoint[2];
+	TEntityUID m_Target;
 
 	// Tank state
 	EState   m_State; // Current state

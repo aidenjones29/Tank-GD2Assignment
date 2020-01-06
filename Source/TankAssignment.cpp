@@ -313,6 +313,17 @@ void UpdateScene( float updateTime )
 	if (KeyHit(Key_F2)) CameraMoveSpeed = 5.0f;
 	if (KeyHit(Key_F3)) CameraMoveSpeed = 40.0f;
 
+	if (KeyHit(Key_1))
+	{
+		for (int i = 0; i < numTanks; i++)
+		{
+			SMessage start;
+			start.from = SystemUID;
+			start.type = Msg_Start;
+			Messenger.SendMessage(Tanks[i], start);
+		}
+	}
+
 	// Move the camera
 	MainCamera->Control( Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D, 
 	                     CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime );

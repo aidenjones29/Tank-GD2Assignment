@@ -1,2 +1,6 @@
 ﻿  TankEntity.cpp
+D:\Users\AJones45\Documents\GitHub\Tank-GD2Ass\Source\Scene\TankEntity.cpp(172,18): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Users\AJones45\Documents\GitHub\Tank-GD2Ass\Source\Scene\TankEntity.cpp(158): warning C4700:  uninitialized local variable 'turScale' used
+D:\Users\AJones45\Documents\GitHub\Tank-GD2Ass\Source\Scene\TankEntity.cpp(158): warning C4700:  uninitialized local variable 'turRot' used
+D:\Users\AJones45\Documents\GitHub\Tank-GD2Ass\Source\Scene\TankEntity.cpp(158): warning C4700:  uninitialized local variable 'turPos' used
   TankAssignment.vcxproj -> D:\Users\AJones45\Documents\GitHub\Tank-GD2Ass\TankAssignment.exe

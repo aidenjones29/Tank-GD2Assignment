@@ -75,15 +75,15 @@ CTankEntity::CTankEntity
 	// Initialise other tank data and state
 	m_Speed = 0.0f;
 	m_HP = m_TankTemplate->GetMaxHP();
-	m_State = Patrol;
-	m_Timer = 0.0f;
+	m_State = Inactive;
+	m_Timer = 1.0f;
 	m_patrolPoint[0] = position;
 	m_patrolPoint[1] = position;
-	m_patrolPoint[0].z += 50;
-	m_patrolPoint[1].z -= 50;
-	m_patrolPoint[0].x += 50;
-	m_patrolPoint[1].x -= 50;
-	m_currentPoint = 0;
+	m_patrolPoint[0].z += 30;
+	m_patrolPoint[1].z -= 30;
+	m_patrolPoint[0].x += 30;
+	m_patrolPoint[1].x -= 30;
+	m_currentPoint = 1;
 }
 
 
@@ -113,36 +113,27 @@ bool CTankEntity::Update( TFloat32 updateTime )
 	// Only move if in Go state
 	if (m_State == Patrol)
 	{
-		//m_Speed = 10.0f * Sin( m_Timer * 4.0f );
-		//m_Timer += updateTime;
 		CVector3 tankPos = Matrix().GetPosition();
 
 		float distance = pointToPoint(tankPos, m_patrolPoint[m_currentPoint]);
 
-		if (distance >= 20.0f)
+		if (distance >= 10.0f)
 		{
 			CVector3 turnVec = tankPos - m_patrolPoint[m_currentPoint];
 			CVector3 tankFacing = Matrix().ZAxis();
 			CVector3 tankXVec = Matrix().XAxis();
 
-			//float length1 = Length(tankFacing);
-			//float length2 = Length(turnVec);
-			//float dotAngle = Dot(turnVec, tankFacing);
-			//float angle = acos(dotAngle / (length1 * length2));
-			//angle = angle * (180/ 3.14159265359);
+			if (Dot(tankXVec, turnVec) < 0)
+			{
+				Matrix().RotateLocalY(2.0f * updateTime);
+			}
+			else if (Dot(tankXVec, turnVec) > 0)
+			{
+				Matrix().RotateLocalY(-2.0f * updateTime);
+			}
 
-			//if (angle > 10.0f && angle < 170.0f)
-			//{
-			if (Dot(tankXVec, m_patrolPoint[m_currentPoint]) >= 0)
-			{
-				Matrix().RotateLocalY(10.0f * updateTime);
-			}
-			else if (Dot(tankXVec, m_patrolPoint[m_currentPoint]) <= 0)
-			{
-				Matrix().RotateLocalY(-10.0f * updateTime);
-			}
-			//}
 			m_Speed = 20.0f;
+			Matrix().MoveLocalZ( m_Speed * updateTime );
 		}
 		else
 		{
@@ -150,10 +141,67 @@ bool CTankEntity::Update( TFloat32 updateTime )
 			{
 				m_currentPoint = 0;
 			}
-			else
+			else if (m_currentPoint == 0)
 			{
 				m_currentPoint = 1;
 			}
+		}
+		
+		Matrix(2).RotateLocalY(2.0f * updateTime);
+
+		CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+
+		CVector3* turPos;
+		CVector3* turRot;
+		CVector3* turScale;
+
+		turretWorld.DecomposeAffineEuler(turPos, turRot, turScale);
+
+		EntityManager.BeginEnumEntities("","", "Tank");
+		CEntity* tankEntity = EntityManager.EnumEntity();
+		while (tankEntity != 0)
+		{
+			if (tankEntity->GetUID() != GetUID())
+			{
+				float length1 = LengthSquared(turretWorld.ZAxis());
+				CVector3 turTurnVec = tankEntity->Position() - turretWorld.Position();
+				float length2 = LengthSquared(turTurnVec);
+				float dotAngle = Dot(turretWorld.ZAxis(), turTurnVec);
+
+				float angle = dotAngle / ((Sqrt(length2) * Sqrt(length1)));
+				float angle2 = acos(angle) * 180 / 3.14159265359;
+
+				if (angle2 < 5.0f)
+				{
+					m_Target = tankEntity->GetUID();
+					m_State = Aim;
+					m_Timer = 1.0f;
+				}
+			}
+
+			tankEntity = EntityManager.EnumEntity();
+		}
+	}
+	else if (m_State == Aim)
+	{
+		if (m_Timer >= 0.0f)
+		{
+			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+			CEntity* tankTarget = EntityManager.GetEntity(m_Target);
+			//CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
+			//
+			//if (Dot(turretWorld.XAxis(), turTurnVec) > 0)
+			//{
+			//	Matrix(2).RotateLocalY(2.0f * updateTime);
+			//}
+			//else if (Dot(turretWorld.XAxis(), turTurnVec) < 0)
+			//{
+			//	Matrix(2).RotateLocalY(-2.0f * updateTime);
+			//}
+			
+			MatrixFaceTarget(turretWorld.Position(), tankTarget->Position())
+
+			m_Timer -= updateTime;
 		}
 	}
 	else 
@@ -163,7 +211,6 @@ bool CTankEntity::Update( TFloat32 updateTime )
 
 	// Perform movement...
 	// Move along local Z axis scaled by update time
-	Matrix().MoveLocalZ( m_Speed * updateTime );
 
 	return true; // Don't destroy the entity
 }
@@ -176,3 +223,13 @@ float pointToPoint(CVector3 pt1, CVector3 pt2)
 
 
 } // namespace gen
+
+
+			//float length1 = Length(tankFacing);
+			//float length2 = Length(turnVec);
+			//float dotAngle = Dot(turnVec, tankFacing);
+			//float angle = acos(dotAngle / (length1 * length2));
+			//angle = angle * (180/ 3.14159265359);
+
+			//if (angle > 10.0f && angle < 170.0f)
+			//{
