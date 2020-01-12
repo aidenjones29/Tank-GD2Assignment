@@ -24,7 +24,7 @@ extern CMessenger Messenger;
 // Will be needed to implement the required shell behaviour in the Update function below
 extern TEntityUID GetTankUID( int team );
 
-
+extern float pointToPoint(CVector3 pt1, CVector3 pt2);
 
 /*-----------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ CShellEntity::CShellEntity
 	const CVector3&  scale /*= CVector3( 1.0f, 1.0f, 1.0f )*/
 ) : CEntity( entityTemplate, UID, name, position, rotation, scale )
 {
-	// Initialise any shell data you add
+	timer = 3.0f;
 }
 
 
@@ -53,8 +53,44 @@ CShellEntity::CShellEntity
 // Return false if the entity is to be destroyed
 bool CShellEntity::Update( TFloat32 updateTime )
 {
-	return true; // Placeholder
+	if (timer >= 0.0f)
+	{
+		Matrix().MoveLocalZ(0.5f);
+		timer -= updateTime;
+
+		EntityManager.BeginEnumEntities("", "", "Tank");
+		CEntity* tankEntity = EntityManager.EnumEntity();
+		while (tankEntity != 0)
+		{
+			if (GetName() != tankEntity->GetName())
+			{
+				float dist = pointToPoint(Matrix().Position(), tankEntity->Position());
+				if (dist <= 5.0f)
+				{
+					SMessage Hit;
+					Hit.from = SystemUID;
+					Hit.type = Msg_Hit;
+					Messenger.SendMessage(tankEntity->GetUID(), Hit);
+
+					return false;
+				}
+			}
+
+			tankEntity = EntityManager.EnumEntity();
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
+//float pointToPoint(CVector3 pt1, CVector3 pt2)
+//{
+//	CVector3 v = pt2 - pt1;
+//	return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+//}
 
 } // namespace gen

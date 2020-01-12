@@ -7,12 +7,15 @@
 // Additional technical notes for the assignment:
 // - Each tank has a team number (0 or 1), HP and other instance data - see the end of TankEntity.h
 //   You will need to add other instance data suitable for the assignment requirements
+
 // - A function GetTankUID is defined in TankAssignment.cpp and made available here, which returns
 //   the UID of the tank on a given team. This can be used to get the enemy tank UID
+
 // - Tanks have three parts: the root, the body and the turret. Each part has its own matrix, which
 //   can be accessed with the Matrix function - root: Matrix(), body: Matrix(1), turret: Matrix(2)
 //   However, the body and turret matrix are relative to the root's matrix - so to get the actual 
 //   world matrix of the body, for example, we must multiply: Matrix(1) * Matrix()
+
 // - Vector facing work similar to the car tag lab will be needed for the turret->enemy facing 
 //   requirements for the Patrol and Aim states
 // - The CMatrix4x4 function DecomposeAffineEuler allows you to extract the x,y & z rotations
@@ -68,10 +71,8 @@ CTankEntity::CTankEntity
 ) : CEntity( tankTemplate, UID, name, position, rotation, scale )
 {
 	m_TankTemplate = tankTemplate;
-
 	// Tanks are on teams so they know who the enemy is
 	m_Team = team;
-
 	// Initialise other tank data and state
 	m_Speed = 0.0f;
 	m_HP = m_TankTemplate->GetMaxHP();
@@ -84,6 +85,7 @@ CTankEntity::CTankEntity
 	m_patrolPoint[0].x += 30;
 	m_patrolPoint[1].x -= 30;
 	m_currentPoint = 1;
+	m_Fired = 0;
 }
 
 
@@ -106,9 +108,13 @@ bool CTankEntity::Update( TFloat32 updateTime )
 			case Msg_Stop:
 				m_State = Inactive;
 				break;
+			case Msg_Hit:
+				m_HP -= 20;
+				break;
 		}
 	}
 
+	if (m_HP <= 0) { return false; }
 	// Tank behaviour
 	// Only move if in Go state
 	if (m_State == Patrol)
@@ -184,24 +190,70 @@ bool CTankEntity::Update( TFloat32 updateTime )
 	}
 	else if (m_State == Aim)
 	{
+		
 		if (m_Timer >= 0.0f)
 		{
 			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
 			CEntity* tankTarget = EntityManager.GetEntity(m_Target);
-			//CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
-			//
-			//if (Dot(turretWorld.XAxis(), turTurnVec) > 0)
-			//{
-			//	Matrix(2).RotateLocalY(2.0f * updateTime);
-			//}
-			//else if (Dot(turretWorld.XAxis(), turTurnVec) < 0)
-			//{
-			//	Matrix(2).RotateLocalY(-2.0f * updateTime);
-			//}
+			CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
+			Normalise(turTurnVec);
 			
-			MatrixFaceTarget(turretWorld.Position(), tankTarget->Position())
+			if (Dot(turretWorld.XAxis(), turTurnVec) > 0.0f)
+			{
+				Matrix(2).RotateLocalY(1.0f * updateTime);
+			}
+			else if (Dot(turretWorld.XAxis(), turTurnVec) < -0.0f)
+			{
+				Matrix(2).RotateLocalY(-1.0f * updateTime);
+			}
 
 			m_Timer -= updateTime;
+		}
+		else
+		{
+			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+			
+			CVector3 turPos;
+			CVector3 turRot;
+			CVector3 turScale;
+			turretWorld.DecomposeAffineEuler(&turPos, &turRot, NULL);
+			EntityManager.CreateShell("Shell Type 1", GetName(), turretWorld.Position(), turRot);
+			
+			CVector3 curPos = Matrix().Position();
+			curPos.x += Random(-40.0f, 40.0f);
+			curPos.z += Random(-40.0f, 40.0f);
+			m_EvadePoint = curPos;
+			m_Fired++;
+			m_State = Evade;
+		}
+	}
+	else if (m_State == Evade)
+	{
+		CVector3 tankPos = Matrix().GetPosition();
+
+		float distance = pointToPoint(tankPos, m_EvadePoint);
+
+		if (distance >= 10.0f)
+		{
+			CVector3 turnVec = tankPos - m_EvadePoint;
+			CVector3 tankFacing = Matrix().ZAxis();
+			CVector3 tankXVec = Matrix().XAxis();
+
+			if (Dot(tankXVec, turnVec) < 0)
+			{
+				Matrix().RotateLocalY(2.0f * updateTime);
+			}
+			else if (Dot(tankXVec, turnVec) > 0)
+			{
+				Matrix().RotateLocalY(-2.0f * updateTime);
+			}
+
+			m_Speed = 20.0f;
+			Matrix().MoveLocalZ(m_Speed * updateTime);
+		}
+		else
+		{
+			m_State = Patrol;
 		}
 	}
 	else 
@@ -223,13 +275,3 @@ float pointToPoint(CVector3 pt1, CVector3 pt2)
 
 
 } // namespace gen
-
-
-			//float length1 = Length(tankFacing);
-			//float length2 = Length(turnVec);
-			//float dotAngle = Dot(turnVec, tankFacing);
-			//float angle = acos(dotAngle / (length1 * length2));
-			//angle = angle * (180/ 3.14159265359);
-
-			//if (angle > 10.0f && angle < 170.0f)
-			//{

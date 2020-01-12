@@ -79,7 +79,11 @@ CCamera* MainCamera;
 float SumUpdateTimes = 0.0f;
 int NumUpdateTimes = 0;
 float AverageUpdateTime = -1.0f; // Invalid value at first
+bool advanceInfo = false;
+int tankCam = 0;
 
+CEntity* target;
+CMatrix4x4 camPos;
 
 //-----------------------------------------------------------------------------
 // Scene management
@@ -141,7 +145,6 @@ bool SceneSetup()
 	Tanks[1] = EntityManager.CreateTank("Oberon MkII", 1, "B-1", CVector3(30.0f, 0.5f, 20.0f),
 		CVector3(0.0f, ToRadians(180.0f), 0.0f));
 
-
 	/////////////////////////////
 	// Camera / light setup
 
@@ -156,6 +159,7 @@ bool SceneSetup()
 	// Ambient light level
 	AmbientLight = SColourRGBA(0.6f, 0.6f, 0.6f, 1.0f);
 
+	target = EntityManager.GetEntity("A-1");
 	return true;
 }
 
@@ -289,8 +293,18 @@ void RenderSceneText( float updateTime )
 			int X, Y;
 			if (MainCamera->PixelFromWorldPt(TankPt, ViewportWidth, ViewportHeight, &X, &Y))
 			{
-				outText << tankEntity->Template()->GetName().c_str() << ": "
-				<< tankEntity->GetName().c_str();
+				if (advanceInfo == false)
+				{
+					outText << tankEntity->Template()->GetName().c_str() << ": "
+						<< tankEntity->GetName().c_str();
+				}
+				else
+				{
+					outText << tankEntity->Template()->GetName().c_str() << ": "
+						<< tankEntity->GetName().c_str() << endl << "HP: " << tankEntity->getHP() << " State: " << tankEntity->getState()
+						<< endl << "Fired: " << tankEntity->getFired();
+				}
+
 				RenderText(outText.str(), X, Y, 0.0f, 1.0f, 0.0f, true);
 
 				outText.str("");
@@ -324,9 +338,35 @@ void UpdateScene( float updateTime )
 		}
 	}
 
+	if (KeyHit(Key_2))
+	{
+		for (int i = 0; i < numTanks; i++)
+		{
+			SMessage start;
+			start.from = SystemUID;
+			start.type = Msg_Stop;
+			Messenger.SendMessage(Tanks[i], start);
+		}
+	}
+
+	if (KeyHit(Key_0)) { advanceInfo = !advanceInfo; }
 	// Move the camera
-	MainCamera->Control( Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D, 
-	                     CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime );
+	if (tankCam == 1)
+	{
+		MainCamera->Control( Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D, 
+						     CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime );
+	}
+	else if (tankCam == 0)
+	{
+		camPos = target->Matrix();
+		camPos.Position().y += 4.0f;
+		camPos.Position().z -= 15.0f;
+		MainCamera->Matrix() = camPos
+	}
+	else
+	{
+	
+	}
 }
 
 

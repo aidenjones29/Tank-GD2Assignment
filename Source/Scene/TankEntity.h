@@ -149,6 +149,32 @@ public:
 		return m_Speed;
 	}
 
+	float getHP()
+	{
+		return m_HP;
+	}
+
+	string getState()
+	{
+		switch (m_State)
+		{
+		case Inactive:
+			return "Inactive";
+		case Patrol:
+			return "Patrol";
+		case Aim:
+			return "Aim";
+		case Evade:
+			return "Evade";
+		default:
+			return "N/A";
+		}
+	}
+
+	int getFired()
+	{
+		return m_Fired;
+	}
 
 	/////////////////////////////////////
 	// Update
@@ -189,10 +215,11 @@ private:
 	int m_currentPoint;
 	CVector3 m_patrolPoint[2];
 	TEntityUID m_Target;
-
+	CVector3 m_EvadePoint;
 	// Tank state
 	EState   m_State; // Current state
 	TFloat32 m_Timer; // A timer used in the example update function
+	int m_Fired;
 
 };
 

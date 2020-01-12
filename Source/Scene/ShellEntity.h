@@ -70,7 +70,7 @@ private:
 
 	/////////////////////////////////////
 	// Data
-
+	float timer;
 	// Add your shell data here
 };
 
