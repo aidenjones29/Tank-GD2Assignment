@@ -122,11 +122,11 @@ bool CTankEntity::Update( TFloat32 updateTime )
 		CVector3 tankPos = Matrix().GetPosition();
 
 		float distance = pointToPoint(tankPos, m_patrolPoint[m_currentPoint]);
-
-		if (distance >= 10.0f)
-		{
-			CVector3 turnVec = tankPos - m_patrolPoint[m_currentPoint];
 			CVector3 tankFacing = Matrix().ZAxis();
+			CVector3 turnVec = tankPos - m_patrolPoint[m_currentPoint];
+
+		if (Dot(Normalise( tankFacing), Normalise(turnVec)) < Cos(2.0f * updateTime))
+		{
 			CVector3 tankXVec = Matrix().XAxis();
 
 			if (Dot(tankXVec, turnVec) < 0)
@@ -141,7 +141,7 @@ bool CTankEntity::Update( TFloat32 updateTime )
 			m_Speed = 20.0f;
 			Matrix().MoveLocalZ( m_Speed * updateTime );
 		}
-		else
+		else if(distance <= 10.0f)
 		{
 			if (m_currentPoint == 1)
 			{
@@ -152,8 +152,14 @@ bool CTankEntity::Update( TFloat32 updateTime )
 				m_currentPoint = 1;
 			}
 		}
+		else
+		{
+			Matrix().FaceTarget(turnVec);
+		}
+
+			
 		
-		Matrix(2).RotateLocalY(2.0f * updateTime);
+		Matrix(2).RotateLocalY(4.0f * updateTime);
 
 		CMatrix4x4 turretWorld = Matrix(2) * Matrix();
 

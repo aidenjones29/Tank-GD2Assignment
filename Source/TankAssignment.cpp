@@ -81,8 +81,9 @@ int NumUpdateTimes = 0;
 float AverageUpdateTime = -1.0f; // Invalid value at first
 bool advanceInfo = false;
 int tankCam = 0;
-
-CEntity* target;
+bool camset = false;
+CEntity* target1;
+CEntity* target2;
 CMatrix4x4 camPos;
 
 //-----------------------------------------------------------------------------
@@ -159,7 +160,8 @@ bool SceneSetup()
 	// Ambient light level
 	AmbientLight = SColourRGBA(0.6f, 0.6f, 0.6f, 1.0f);
 
-	target = EntityManager.GetEntity("A-1");
+	target1 = EntityManager.GetEntity("A-1");
+	target2 = EntityManager.GetEntity("B-1");
 	return true;
 }
 
@@ -351,21 +353,29 @@ void UpdateScene( float updateTime )
 
 	if (KeyHit(Key_0)) { advanceInfo = !advanceInfo; }
 	// Move the camera
+
+	if (KeyHit(Key_Numpad1)) { tankCam = 0; }
+	if (KeyHit(Key_Numpad2)) { tankCam = 1; }
+	if (KeyHit(Key_Numpad3)) { tankCam = 2; }
+
 	if (tankCam == 1)
 	{
-		MainCamera->Control( Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D, 
-						     CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime );
-	}
-	else if (tankCam == 0)
-	{
-		camPos = target->Matrix();
+		camPos = target1->Matrix();
 		camPos.Position().y += 4.0f;
-		camPos.Position().z -= 15.0f;
-		MainCamera->Matrix() = camPos
+		camPos.MoveLocalZ(-15);
+		MainCamera->Matrix() = camPos;
+	}
+	else if (tankCam == 2)
+	{
+		camPos = target2->Matrix();
+		camPos.Position().y += 4.0f;
+		camPos.MoveLocalZ(-15);
+		MainCamera->Matrix() = camPos;
 	}
 	else
 	{
-	
+		MainCamera->Control(Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D,
+			CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime);
 	}
 }
 
