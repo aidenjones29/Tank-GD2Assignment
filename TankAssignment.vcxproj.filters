@@ -101,6 +101,9 @@
     <ClCompile Include="Source\Scene\TankEntity.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="AmmoEntity.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Scene\Camera.h">
@@ -195,6 +198,9 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\TankEntity.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="AmmoEntity.h">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>

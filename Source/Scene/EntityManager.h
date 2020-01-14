@@ -103,6 +103,15 @@ public:
 		const CVector3& scale = CVector3(1.0f, 1.0f, 1.0f)
 	);
 
+	TEntityUID CreateAmmo
+	(
+		const string& templateName,
+		const string& name = "",
+		const CVector3& position = CVector3::kOrigin,
+		const CVector3& rotation = CVector3(0.0f, 0.0f, 0.0f),
+		const CVector3& scale = CVector3(1.0f, 1.0f, 1.0f)
+	);
+
 
 	// Destroy the given entity - returns true if the entity existed and was destroyed
 	bool DestroyEntity( TEntityUID UID );

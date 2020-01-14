@@ -60,9 +60,10 @@ bool CShellEntity::Update( TFloat32 updateTime )
 
 		EntityManager.BeginEnumEntities("", "", "Tank");
 		CEntity* tankEntity = EntityManager.EnumEntity();
+		CTankEntity* tank = static_cast<CTankEntity*>(tankEntity);
 		while (tankEntity != 0)
 		{
-			if (GetName() != tankEntity->GetName())
+			if (GetName() != tankEntity->GetName() && tank->getState() != "Dead")
 			{
 				float dist = pointToPoint(Matrix().Position(), tankEntity->Position());
 				if (dist <= 5.0f)

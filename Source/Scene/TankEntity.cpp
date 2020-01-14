@@ -80,12 +80,15 @@ CTankEntity::CTankEntity
 	m_Timer = 1.0f;
 	m_patrolPoint[0] = position;
 	m_patrolPoint[1] = position;
-	m_patrolPoint[0].z += 30;
-	m_patrolPoint[1].z -= 30;
-	m_patrolPoint[0].x += 30;
-	m_patrolPoint[1].x -= 30;
+	m_patrolPoint[0].z += Random(0,30);
+	m_patrolPoint[1].z -= Random(0, 30);
+	m_patrolPoint[0].x += Random(0, 30);
+	m_patrolPoint[1].x -= Random(0, 30);
 	m_currentPoint = 1;
 	m_Fired = 0;
+	m_Facing = false;
+	m_deadSpeed = 0.1f;
+	m_ammoCount = 10;
 }
 
 
@@ -94,7 +97,7 @@ CTankEntity::CTankEntity
 // Return false if the entity is to be destroyed
 bool CTankEntity::Update( TFloat32 updateTime )
 {
-	
+	CEntity* tankE = EntityManager.GetEntity(GetUID());
 	// Fetch any messages
 	SMessage msg;
 	while (Messenger.FetchMessage( GetUID(), &msg ))
@@ -110,11 +113,17 @@ bool CTankEntity::Update( TFloat32 updateTime )
 				break;
 			case Msg_Hit:
 				m_HP -= 20;
+			case Msg_Ammo:
+				m_ammoCount = 10;
 				break;
 		}
 	}
 
-	if (m_HP <= 0) { return false; }
+	if (m_HP <= 0) 
+	{ 
+		m_State = Dead; 
+	}
+
 	// Tank behaviour
 	// Only move if in Go state
 	if (m_State == Patrol)
@@ -128,28 +137,37 @@ bool CTankEntity::Update( TFloat32 updateTime )
 		if (Dot(Normalise( tankFacing), Normalise(turnVec)) < Cos(2.0f * updateTime))
 		{
 			CVector3 tankXVec = Matrix().XAxis();
-
-			if (Dot(tankXVec, turnVec) < 0)
+			if (Dot(tankXVec, turnVec) >= -0.5f && Dot(tankXVec, turnVec) <= 0.5f)
 			{
-				Matrix().RotateLocalY(2.0f * updateTime);
-			}
-			else if (Dot(tankXVec, turnVec) > 0)
-			{
-				Matrix().RotateLocalY(-2.0f * updateTime);
+				m_Facing = true;
 			}
 
-			m_Speed = 20.0f;
-			Matrix().MoveLocalZ( m_Speed * updateTime );
+			if (m_Facing == false)
+			{
+				if (Dot(tankXVec, turnVec) < 0)
+				{
+					Matrix().RotateLocalY(m_TankTemplate->GetTurnSpeed() * updateTime);
+				}
+				else if (Dot(tankXVec, turnVec) > 0)
+				{
+					Matrix().RotateLocalY(-m_TankTemplate->GetTurnSpeed() * updateTime);
+				}
+			}
+
+			//m_Speed = 20.0f;
+			Matrix().MoveLocalZ( m_TankTemplate->GetMaxSpeed() * updateTime );
 		}
 		else if(distance <= 10.0f)
 		{
 			if (m_currentPoint == 1)
 			{
 				m_currentPoint = 0;
+				m_Facing = false;
 			}
 			else if (m_currentPoint == 0)
 			{
 				m_currentPoint = 1;
+				m_Facing = false;
 			}
 		}
 		else
@@ -159,7 +177,7 @@ bool CTankEntity::Update( TFloat32 updateTime )
 
 			
 		
-		Matrix(2).RotateLocalY(4.0f * updateTime);
+		Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
 
 		CMatrix4x4 turretWorld = Matrix(2) * Matrix();
 
@@ -171,9 +189,11 @@ bool CTankEntity::Update( TFloat32 updateTime )
 
 		EntityManager.BeginEnumEntities("","", "Tank");
 		CEntity* tankEntity = EntityManager.EnumEntity();
+
 		while (tankEntity != 0)
 		{
-			if (tankEntity->GetUID() != GetUID())
+			CTankEntity* tank = static_cast<CTankEntity*>(tankEntity);
+			if (tankEntity->GetUID() != GetUID() && tank->m_Team != m_Team)
 			{
 				float length1 = LengthSquared(turretWorld.ZAxis());
 				CVector3 turTurnVec = tankEntity->Position() - turretWorld.Position();
@@ -187,6 +207,7 @@ bool CTankEntity::Update( TFloat32 updateTime )
 				{
 					m_Target = tankEntity->GetUID();
 					m_State = Aim;
+					m_Facing = false;
 					m_Timer = 1.0f;
 				}
 			}
@@ -197,7 +218,7 @@ bool CTankEntity::Update( TFloat32 updateTime )
 	else if (m_State == Aim)
 	{
 		
-		if (m_Timer >= 0.0f)
+		if (m_Timer >= 0.0f && m_ammoCount >= 0)
 		{
 			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
 			CEntity* tankTarget = EntityManager.GetEntity(m_Target);
@@ -206,24 +227,27 @@ bool CTankEntity::Update( TFloat32 updateTime )
 			
 			if (Dot(turretWorld.XAxis(), turTurnVec) > 0.0f)
 			{
-				Matrix(2).RotateLocalY(1.0f * updateTime);
+				Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
 			}
 			else if (Dot(turretWorld.XAxis(), turTurnVec) < -0.0f)
 			{
-				Matrix(2).RotateLocalY(-1.0f * updateTime);
+				Matrix(2).RotateLocalY(-m_TankTemplate->GetTurretTurnSpeed() * updateTime);
 			}
 
 			m_Timer -= updateTime;
 		}
 		else
 		{
-			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+			if (m_ammoCount >= 0)
+			{
+				CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+				CVector3 turPos;
+				CVector3 turRot;
+				CVector3 turScale;
+				turretWorld.DecomposeAffineEuler(&turPos, &turRot, NULL);
+				EntityManager.CreateShell("Shell Type 1", GetName(), turretWorld.Position(), turRot);
+			}
 			
-			CVector3 turPos;
-			CVector3 turRot;
-			CVector3 turScale;
-			turretWorld.DecomposeAffineEuler(&turPos, &turRot, NULL);
-			EntityManager.CreateShell("Shell Type 1", GetName(), turretWorld.Position(), turRot);
 			
 			CVector3 curPos = Matrix().Position();
 			curPos.x += Random(-40.0f, 40.0f);
@@ -245,22 +269,44 @@ bool CTankEntity::Update( TFloat32 updateTime )
 			CVector3 tankFacing = Matrix().ZAxis();
 			CVector3 tankXVec = Matrix().XAxis();
 
-			if (Dot(tankXVec, turnVec) < 0)
+			if (Dot(tankXVec, turnVec) >= -0.5f && Dot(tankXVec, turnVec) <= 0.5f)
 			{
-				Matrix().RotateLocalY(2.0f * updateTime);
-			}
-			else if (Dot(tankXVec, turnVec) > 0)
-			{
-				Matrix().RotateLocalY(-2.0f * updateTime);
+				m_Facing = true;
 			}
 
-			m_Speed = 20.0f;
-			Matrix().MoveLocalZ(m_Speed * updateTime);
+			if (m_Facing == false)
+			{
+				if (Dot(tankXVec, turnVec) < 0)
+				{
+					Matrix().RotateLocalY(m_TankTemplate->GetTurnSpeed() * updateTime);
+				}
+				else if (Dot(tankXVec, turnVec) > 0)
+				{
+					Matrix().RotateLocalY(-m_TankTemplate->GetTurnSpeed() * updateTime);
+				}
+			}
+			//m_Speed = 20.0f;
+			Matrix().MoveLocalZ(m_TankTemplate->GetMaxSpeed()* updateTime);
 		}
 		else
 		{
 			m_State = Patrol;
+			m_Facing = false;
 		}
+	}
+	else if (m_State == Dead)
+	{
+		Matrix(2).RotateY(1.0f);
+		Matrix(2).MoveLocalY(m_deadSpeed);
+		if (Matrix(2).Position().y >= 6)
+		{
+			m_deadSpeed = -0.1f;
+		}
+		if (Matrix(2).Position().y <= 0)
+		{
+			return false;
+		}
+
 	}
 	else 
 	{

@@ -166,9 +166,16 @@ public:
 			return "Aim";
 		case Evade:
 			return "Evade";
+		case Dead:
+			return "Dead";
 		default:
 			return "N/A";
 		}
+	}
+
+	int getTeam()
+	{
+		return m_Team;
 	}
 
 	int getFired()
@@ -199,6 +206,7 @@ private:
 		Patrol,
 		Aim,
 		Evade,
+		Dead,
 	};
 
 
@@ -220,7 +228,9 @@ private:
 	EState   m_State; // Current state
 	TFloat32 m_Timer; // A timer used in the example update function
 	int m_Fired;
-
+	bool m_Facing;
+	float m_deadSpeed;
+	int m_ammoCount;
 };
 
 

@@ -65,7 +65,7 @@ extern CMessenger Messenger;
 CEntityManager EntityManager;
 
 // Tank UIDs
-const int numTanks = 2;
+const int numTanks = 6;
 TEntityUID Tanks[numTanks];
 
 // Other scene elements
@@ -85,6 +85,8 @@ bool camset = false;
 CEntity* target1;
 CEntity* target2;
 CMatrix4x4 camPos;
+float ammoTimer = 10.0f;
+int ammoAmmount = 0;
 
 //-----------------------------------------------------------------------------
 // Scene management
@@ -128,23 +130,38 @@ bool SceneSetup()
 
 	// Template type, template name, mesh name, top speed, acceleration, tank turn speed, turret
 	// turn speed, max HP and shell damage. These latter settings are for advanced requirements only
+	EntityManager.CreateTankTemplate("Tank", "Rogue Leader", "HoverTank04.x",
+		20.0f, 2.2f, 2.0f, kfPi / 3, 120, 20);
 	EntityManager.CreateTankTemplate("Tank", "Rogue Scout", "HoverTank02.x",
 		24.0f, 2.2f, 2.0f, kfPi / 3, 100, 20);
-	EntityManager.CreateTankTemplate("Tank", "Oberon MkII", "HoverTank07.x",
+	EntityManager.CreateTankTemplate("Tank", "Oberon MkII", "HoverTank08.x",
 		18.0f, 1.6f, 1.3f, kfPi / 4, 120, 35);
+	EntityManager.CreateTankTemplate("Tank", "Oberon MkI", "HoverTank07.x",
+		18.0f, 1.6f, 1.3f, kfPi / 4, 100, 35);
 
 	// Template for tank shell
 	EntityManager.CreateTemplate("Projectile", "Shell Type 1", "Bullet.x");
+
+
+	EntityManager.CreateTemplate("Ammo", "AmmoCrate", "Matchbox.x");
 
 
 	////////////////////////////////
 	// Create tank entities
 
 	// Type (template name), team number, tank name, position, rotation
-	Tanks[0] = EntityManager.CreateTank("Rogue Scout", 0, "A-1", CVector3(-30.0f, 0.5f, -20.0f),
-		CVector3(0.0f, ToRadians(0.0f), 0.0f));
-	Tanks[1] = EntityManager.CreateTank("Oberon MkII", 1, "B-1", CVector3(30.0f, 0.5f, 20.0f),
-		CVector3(0.0f, ToRadians(180.0f), 0.0f));
+	Tanks[0] = EntityManager.CreateTank("Rogue Leader", 0, "A-1", CVector3(-30.0f, 0.5f, -20.0f),
+		CVector3(0.0f, ToRadians(90.0f), 0.0f));
+	Tanks[2] = EntityManager.CreateTank("Rogue Scout", 0, "A-2", CVector3(-40.0f, 0.5f, -30.0f),
+		CVector3(0.0f, ToRadians(90.0f), 0.0f));
+	Tanks[3] = EntityManager.CreateTank("Rogue Scout", 0, "A-3", CVector3(-40.0f, 0.5f, -10.0f),
+		CVector3(0.0f, ToRadians(90.0f), 0.0f));
+	Tanks[1] = EntityManager.CreateTank("Oberon MkII", 1, "B-1", CVector3(50.0f, 0.5f, 20.0f),
+		CVector3(0.0f, ToRadians(270.0f), 0.0f));
+	Tanks[4] = EntityManager.CreateTank("Oberon MkI", 1, "B-2", CVector3(60.0f, 0.5f, 30.0f),
+		CVector3(0.0f, ToRadians(270.0f), 0.0f));
+	Tanks[5] = EntityManager.CreateTank("Oberon MkI", 1, "B-3", CVector3(60.0f, 0.5f, 10.0f),
+		CVector3(0.0f, ToRadians(270.0f), 0.0f));
 
 	/////////////////////////////
 	// Camera / light setup
@@ -291,10 +308,14 @@ void RenderSceneText( float updateTime )
 			CTankEntity* tankEntity = static_cast<CTankEntity*>(entity);
 			CVector3 TankPt = tankEntity->Position();
 
+			CVector3 rgb = { 0.0f, 0.0f, 0.0f };
 			// Convert monster world position to pixel coordinate (picking in Camera class)
 			int X, Y;
 			if (MainCamera->PixelFromWorldPt(TankPt, ViewportWidth, ViewportHeight, &X, &Y))
 			{
+				if (tankEntity->getTeam() == 0) { rgb = { 0.0f, 1.0f, 0.0f }; }
+				else if (tankEntity->getTeam() == 1) { rgb = { 1.0f, 0.0f, 0.0f }; }
+
 				if (advanceInfo == false)
 				{
 					outText << tankEntity->Template()->GetName().c_str() << ": "
@@ -307,7 +328,7 @@ void RenderSceneText( float updateTime )
 						<< endl << "Fired: " << tankEntity->getFired();
 				}
 
-				RenderText(outText.str(), X, Y, 0.0f, 1.0f, 0.0f, true);
+				RenderText(outText.str(), X, Y, rgb.x, rgb.y, rgb.z, true);
 
 				outText.str("");
 			}
@@ -358,14 +379,14 @@ void UpdateScene( float updateTime )
 	if (KeyHit(Key_Numpad2)) { tankCam = 1; }
 	if (KeyHit(Key_Numpad3)) { tankCam = 2; }
 
-	if (tankCam == 1)
+	if (tankCam == 1 && target1->GetName() == "A-1")
 	{
 		camPos = target1->Matrix();
 		camPos.Position().y += 4.0f;
 		camPos.MoveLocalZ(-15);
 		MainCamera->Matrix() = camPos;
 	}
-	else if (tankCam == 2)
+	else if (tankCam == 2 && target2->GetName() == "B-1")
 	{
 		camPos = target2->Matrix();
 		camPos.Position().y += 4.0f;
@@ -376,6 +397,16 @@ void UpdateScene( float updateTime )
 	{
 		MainCamera->Control(Key_Up, Key_Down, Key_Left, Key_Right, Key_W, Key_S, Key_A, Key_D,
 			CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime);
+	}
+
+	ammoTimer -= updateTime;
+	if (ammoTimer <= 0.0f)
+	{
+		CVector3 randpos = { Random(0,50),Random(0,50),Random(0,50) };
+		CVector3 rot = { 0.0f, 0.0f, 0.0f };
+		EntityManager.CreateShell("AmmoCrate", "Ammo " + ammoAmmount, randpos, rot , CVector3{ 0.1f, 0.1f, 0.1f });
+		ammoAmmount++;
+		ammoTimer = 10.0f;
 	}
 }
 
