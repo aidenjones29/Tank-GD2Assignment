@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- Level Setup -->
+<Level>
+
+  <!-- Entity Templates -->
+  <Templates>
+
+    <!-- Scenery Types -->
+    <EntityTemplate Type="Scenery" Name="Skybox" Mesh="Skybox.x"/>
+    <EntityTemplate Type="Scenery" Name="Floor" Mesh="Floor.x"/>
+    <EntityTemplate Type="Scenery" Name="Building" Mesh="Building.x"/>
+    <EntityTemplate Type="Scenery" Name="Tree" Mesh="Tree1.x"/>
+
+    <!-- Other Types -->
+    <EntityTemplate Type="Projectile" Name="Shell" Mesh="Bullet.x"/>
+    <EntityTemplate Type="Ammo" Name="AmmoCrate" Mesh="Matchbox.x"/>
+
+  </Templates>
+  <!-- End of Entity Types -->
+
+  
+  <!-- Scene Setup -->
+  <Entities>
+
+    <!-- Environment Positions -->
+    <Entity Type="Scenery" Name="Floor">
+      <Position X="0.0" Y="-0.04" Z="0.0"/>
+      <Scale X="20.0" Y="20.0" Z="20.0"/>
+    </Entity>
+    <Entity Type="Scenery" Name="Skybox">
+      <Position X="0.0" Y="-10000.0" Z="0.0"/>
+      <Scale X="10.0" Y="10.0" Z="10.0"/>
+    </Entity>
+    <Entity Type="Scenery" Name="Building">
+      <Position X="0.0" Y="0.0" Z="40.0"/>
+    </Entity>
+
+    <!-- Object Positions -->
+    <Entity Type="Scenery" Name="Tree">
+      <Position X="-200.0" Y="1200.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+  </Entities>
+  <!-- End of Scene Setup -->
+
+</Level>

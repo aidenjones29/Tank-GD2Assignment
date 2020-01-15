@@ -211,7 +211,7 @@ TEntityUID CEntityManager::CreateAmmo
 	CEntityTemplate* entityTemplate = GetTemplate(templateName);
 
 	// Create new tank entity with next UID
-	CEntity* newEntity = new CShellEntity(entityTemplate, m_NextUID,
+	CEntity* newEntity = new CAmmoEntity(entityTemplate, m_NextUID,
 		name, position, rotation, scale);
 
 	// Get vector index for new entity and add it to vector

@@ -74,7 +74,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4089 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>d3d10.lib;d3dx10d.lib;d3dx9d.lib;d3dxof.lib;dxguid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libexpat.lib;d3d10.lib;d3dx10d.lib;d3dx9d.lib;d3dxof.lib;dxguid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Expat 2.1.0\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)TankAssignment.pdb</ProgramDatabaseFile>
@@ -126,7 +126,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AmmoEntity.cpp" />
+    <ClCompile Include="Source\Data\CParseLevel.cpp" />
+    <ClCompile Include="Source\Data\CParseXML.cpp" />
+    <ClCompile Include="Source\Scene\AmmoEntity.cpp" />
     <ClCompile Include="Source\Scene\Camera.cpp" />
     <ClCompile Include="Source\Scene\Entity.cpp" />
     <ClCompile Include="Source\Scene\EntityManager.cpp" />
@@ -157,7 +159,9 @@
     <ClCompile Include="Source\TankAssignment.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AmmoEntity.h" />
+    <ClInclude Include="Source\Data\CParseLevel.h" />
+    <ClInclude Include="Source\Data\CParseXML.h" />
+    <ClInclude Include="Source\Scene\AmmoEntity.h" />
     <ClInclude Include="Source\Scene\Camera.h" />
     <ClInclude Include="Source\Scene\Entity.h" />
     <ClInclude Include="Source\Scene\EntityManager.h" />
@@ -193,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Render\TankAssignment.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Entities.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

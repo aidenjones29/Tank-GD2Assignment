@@ -15,6 +15,7 @@ using namespace std;
 #include "Entity.h"
 #include "TankEntity.h"
 #include "ShellEntity.h"
+#include "AmmoEntity.h"
 #include "Camera.h"
 
 namespace gen

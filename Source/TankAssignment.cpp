@@ -17,6 +17,7 @@ using namespace std;
 #include "Light.h"
 #include "EntityManager.h"
 #include "Messenger.h"
+#include "CParseLevel.h"
 #include "TankAssignment.h"
 
 namespace gen
@@ -63,6 +64,7 @@ extern CMessenger Messenger;
 
 // Entity manager
 CEntityManager EntityManager;
+CParseLevel LevelParser(&EntityManager);
 
 // Tank UIDs
 const int numTanks = 6;
@@ -85,7 +87,7 @@ bool camset = false;
 CEntity* target1;
 CEntity* target2;
 CMatrix4x4 camPos;
-float ammoTimer = 10.0f;
+float ammoTimer = 2.0f;
 int ammoAmmount = 0;
 
 //-----------------------------------------------------------------------------
@@ -99,30 +101,30 @@ bool SceneSetup()
 	// Prepare render methods
 
 	InitialiseMethods();
-
+	LevelParser.ParseFile("Entities.xml");
 
 	//////////////////////////////////////////
 	// Create scenery templates and entities
 
 	// Create scenery templates - loads the meshes
 	// Template type, template name, mesh name
-	EntityManager.CreateTemplate("Scenery", "Skybox", "Skybox.x");
-	EntityManager.CreateTemplate("Scenery", "Floor", "Floor.x");
-	EntityManager.CreateTemplate("Scenery", "Building", "Building.x");
-	EntityManager.CreateTemplate("Scenery", "Tree", "Tree1.x");
+	//EntityManager.CreateTemplate("Scenery", "Skybox", "Skybox.x");
+	//EntityManager.CreateTemplate("Scenery", "Floor", "Floor.x");
+	//EntityManager.CreateTemplate("Scenery", "Building", "Building.x");
+	//EntityManager.CreateTemplate("Scenery", "Tree", "Tree1.x");
 
 	// Creates scenery entities
 	// Type (template name), entity name, position, rotation, scale
-	EntityManager.CreateEntity("Skybox", "Skybox", CVector3(0.0f, -10000.0f, 0.0f), CVector3::kZero, CVector3(10, 10, 10));
-	EntityManager.CreateEntity("Floor", "Floor");
-	EntityManager.CreateEntity("Building", "Building", CVector3(0.0f, 0.0f, 40.0f));
-	for (int tree = 0; tree < 100; ++tree)
-	{
-		// Some random trees
-		EntityManager.CreateEntity( "Tree", "Tree",
-			                        CVector3(Random(-200.0f, 30.0f), 0.0f, Random(40.0f, 150.0f)),
-			                        CVector3(0.0f, Random(0.0f, 2.0f * kfPi), 0.0f) );
-	}
+	//EntityManager.CreateEntity("Skybox", "Skybox", CVector3(0.0f, -10000.0f, 0.0f), CVector3::kZero, CVector3(10, 10, 10));
+	//EntityManager.CreateEntity("Floor", "Floor");
+	//EntityManager.CreateEntity("Building", "Building", CVector3(0.0f, 0.0f, 40.0f));
+	//for (int tree = 0; tree < 100; ++tree)
+	//{
+	//	// Some random trees
+	//	EntityManager.CreateEntity( "Tree", "Tree",
+	//		                        CVector3(Random(-200.0f, 30.0f), 0.0f, Random(40.0f, 150.0f)),
+	//		                        CVector3(0.0f, Random(0.0f, 2.0f * kfPi), 0.0f) );
+	//}
 
 
 	/////////////////////////////////
@@ -140,10 +142,10 @@ bool SceneSetup()
 		18.0f, 1.6f, 1.3f, kfPi / 4, 100, 35);
 
 	// Template for tank shell
-	EntityManager.CreateTemplate("Projectile", "Shell Type 1", "Bullet.x");
+	//EntityManager.CreateTemplate("Projectile", "Shell", "Bullet.x");
 
 
-	EntityManager.CreateTemplate("Ammo", "AmmoCrate", "Matchbox.x");
+	//EntityManager.CreateTemplate("Ammo", "AmmoCrate", "Matchbox.x");
 
 
 	////////////////////////////////
@@ -307,7 +309,7 @@ void RenderSceneText( float updateTime )
 		{
 			CTankEntity* tankEntity = static_cast<CTankEntity*>(entity);
 			CVector3 TankPt = tankEntity->Position();
-
+	
 			CVector3 rgb = { 0.0f, 0.0f, 0.0f };
 			// Convert monster world position to pixel coordinate (picking in Camera class)
 			int X, Y;
@@ -315,7 +317,7 @@ void RenderSceneText( float updateTime )
 			{
 				if (tankEntity->getTeam() == 0) { rgb = { 0.0f, 1.0f, 0.0f }; }
 				else if (tankEntity->getTeam() == 1) { rgb = { 1.0f, 0.0f, 0.0f }; }
-
+	
 				if (advanceInfo == false)
 				{
 					outText << tankEntity->Template()->GetName().c_str() << ": "
@@ -327,14 +329,14 @@ void RenderSceneText( float updateTime )
 						<< tankEntity->GetName().c_str() << endl << "HP: " << tankEntity->getHP() << " State: " << tankEntity->getState()
 						<< endl << "Fired: " << tankEntity->getFired();
 				}
-
+	
 				RenderText(outText.str(), X, Y, rgb.x, rgb.y, rgb.z, true);
-
+	
 				outText.str("");
 			}
 		}
 	}
-
+	outText.str("");
 
 }
 
@@ -402,11 +404,11 @@ void UpdateScene( float updateTime )
 	ammoTimer -= updateTime;
 	if (ammoTimer <= 0.0f)
 	{
-		CVector3 randpos = { Random(0,50),Random(0,50),Random(0,50) };
+		CVector3 randpos = { Random(0.0f, 50.0f), 5.0f, Random(0.0f, 50.0f) };
 		CVector3 rot = { 0.0f, 0.0f, 0.0f };
-		EntityManager.CreateShell("AmmoCrate", "Ammo " + ammoAmmount, randpos, rot , CVector3{ 0.1f, 0.1f, 0.1f });
+		EntityManager.CreateAmmo("AmmoCrate", "Ammo" + ammoAmmount, randpos, rot , CVector3{ 0.2f, 0.2f, 0.1f });
 		ammoAmmount++;
-		ammoTimer = 10.0f;
+		ammoTimer = 2.0f;
 	}
 }
 

@@ -88,10 +88,4 @@ bool CShellEntity::Update( TFloat32 updateTime )
 	}
 }
 
-//float pointToPoint(CVector3 pt1, CVector3 pt2)
-//{
-//	CVector3 v = pt2 - pt1;
-//	return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
-//}
-
 } // namespace gen

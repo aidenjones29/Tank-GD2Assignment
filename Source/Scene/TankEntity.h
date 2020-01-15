@@ -168,6 +168,8 @@ public:
 			return "Evade";
 		case Dead:
 			return "Dead";
+		case Ammo:
+			return "Ammo";
 		default:
 			return "N/A";
 		}
@@ -207,6 +209,7 @@ private:
 		Aim,
 		Evade,
 		Dead,
+		Ammo,
 	};
 
 
