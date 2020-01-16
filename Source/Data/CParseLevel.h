@@ -89,6 +89,11 @@ private:
 	// Called when the parser meets the end of an element (closing tag) in the entities section
 	void EntitiesEndElt( const string& eltName );
 
+	void TankTemplateStartElt(const string& eltName, SAttribute* attrs);
+
+	// Called when the parser meets the end of an element (closing tag) in the entities section
+	void TankTemplateEndElt(const string& eltName);
+
 	// Called when the parser meets the start of an element (opening tag) of a entity component
 	void ComponentsStartElt( const string& typeName, SAttribute* attrs );
 
@@ -108,6 +113,12 @@ private:
 	string   m_TemplateType;
 	string   m_TemplateName;
 	string   m_TemplateMesh;
+	float   m_MaxSpeed;
+	float   m_Acceleration;
+	float   m_TurnSpeed;
+	float   m_TurTurnSpeed;
+	float   m_MaxHP;
+	float   m_ShellDamage;
 
 	// Current entity state (i.e. latest values read during parsing)
 	CEntity* m_Entity;

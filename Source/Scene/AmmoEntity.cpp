@@ -48,7 +48,31 @@ namespace gen
 	// Return false if the entity is to be destroyed
 	bool CAmmoEntity::Update(TFloat32 updateTime)
 	{
-		Matrix().RotateLocalY(5.0f);
+		Matrix().RotateLocalY(1.0f * updateTime);
+
+		EntityManager.BeginEnumEntities("", "", "Tank");
+		CEntity* tankEntity = EntityManager.EnumEntity();
+		while (tankEntity != 0)
+		{
+		CTankEntity* tank = static_cast<CTankEntity*>(tankEntity);
+			if (tank->getState() == "Ammo")
+			{
+				float dist = pointToPoint(Matrix().Position(), tankEntity->Position());
+				if (dist <= 10.0f)
+				{
+					SMessage Ammo;
+					Ammo.from = SystemUID;
+					Ammo.type = Msg_Ammo;
+					Messenger.SendMessage(tankEntity->GetUID(), Ammo);
+
+					return false;
+				}
+			}
+
+			tankEntity = EntityManager.EnumEntity();
+		}
+
+		return true;
 			return true;
 	}
 } // namespace gen

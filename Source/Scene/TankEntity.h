@@ -184,6 +184,11 @@ public:
 	{
 		return m_Fired;
 	}
+	
+	int getAmmo()
+	{
+		return m_ammoCount;
+	}
 
 	/////////////////////////////////////
 	// Update

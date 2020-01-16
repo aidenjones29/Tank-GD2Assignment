@@ -87,8 +87,9 @@ bool camset = false;
 CEntity* target1;
 CEntity* target2;
 CMatrix4x4 camPos;
-float ammoTimer = 2.0f;
-int ammoAmmount = 0;
+float ammoTimer = 3.0f;
+bool AmmoSpawn = false;
+int ammoCount = 0;
 
 //-----------------------------------------------------------------------------
 // Scene management
@@ -101,52 +102,9 @@ bool SceneSetup()
 	// Prepare render methods
 
 	InitialiseMethods();
+
+	//LOAD XML file templates
 	LevelParser.ParseFile("Entities.xml");
-
-	//////////////////////////////////////////
-	// Create scenery templates and entities
-
-	// Create scenery templates - loads the meshes
-	// Template type, template name, mesh name
-	//EntityManager.CreateTemplate("Scenery", "Skybox", "Skybox.x");
-	//EntityManager.CreateTemplate("Scenery", "Floor", "Floor.x");
-	//EntityManager.CreateTemplate("Scenery", "Building", "Building.x");
-	//EntityManager.CreateTemplate("Scenery", "Tree", "Tree1.x");
-
-	// Creates scenery entities
-	// Type (template name), entity name, position, rotation, scale
-	//EntityManager.CreateEntity("Skybox", "Skybox", CVector3(0.0f, -10000.0f, 0.0f), CVector3::kZero, CVector3(10, 10, 10));
-	//EntityManager.CreateEntity("Floor", "Floor");
-	//EntityManager.CreateEntity("Building", "Building", CVector3(0.0f, 0.0f, 40.0f));
-	//for (int tree = 0; tree < 100; ++tree)
-	//{
-	//	// Some random trees
-	//	EntityManager.CreateEntity( "Tree", "Tree",
-	//		                        CVector3(Random(-200.0f, 30.0f), 0.0f, Random(40.0f, 150.0f)),
-	//		                        CVector3(0.0f, Random(0.0f, 2.0f * kfPi), 0.0f) );
-	//}
-
-
-	/////////////////////////////////
-	// Create tank templates
-
-	// Template type, template name, mesh name, top speed, acceleration, tank turn speed, turret
-	// turn speed, max HP and shell damage. These latter settings are for advanced requirements only
-	EntityManager.CreateTankTemplate("Tank", "Rogue Leader", "HoverTank04.x",
-		20.0f, 2.2f, 2.0f, kfPi / 3, 120, 20);
-	EntityManager.CreateTankTemplate("Tank", "Rogue Scout", "HoverTank02.x",
-		24.0f, 2.2f, 2.0f, kfPi / 3, 100, 20);
-	EntityManager.CreateTankTemplate("Tank", "Oberon MkII", "HoverTank08.x",
-		18.0f, 1.6f, 1.3f, kfPi / 4, 120, 35);
-	EntityManager.CreateTankTemplate("Tank", "Oberon MkI", "HoverTank07.x",
-		18.0f, 1.6f, 1.3f, kfPi / 4, 100, 35);
-
-	// Template for tank shell
-	//EntityManager.CreateTemplate("Projectile", "Shell", "Bullet.x");
-
-
-	//EntityManager.CreateTemplate("Ammo", "AmmoCrate", "Matchbox.x");
-
 
 	////////////////////////////////
 	// Create tank entities
@@ -327,7 +285,7 @@ void RenderSceneText( float updateTime )
 				{
 					outText << tankEntity->Template()->GetName().c_str() << ": "
 						<< tankEntity->GetName().c_str() << endl << "HP: " << tankEntity->getHP() << " State: " << tankEntity->getState()
-						<< endl << "Fired: " << tankEntity->getFired();
+						<< endl << "Fired: " << tankEntity->getFired() << " Ammo: " << tankEntity->getAmmo();
 				}
 	
 				RenderText(outText.str(), X, Y, rgb.x, rgb.y, rgb.z, true);
@@ -361,6 +319,7 @@ void UpdateScene( float updateTime )
 			start.type = Msg_Start;
 			Messenger.SendMessage(Tanks[i], start);
 		}
+		AmmoSpawn = true;
 	}
 
 	if (KeyHit(Key_2))
@@ -372,6 +331,7 @@ void UpdateScene( float updateTime )
 			start.type = Msg_Stop;
 			Messenger.SendMessage(Tanks[i], start);
 		}
+		AmmoSpawn = false;
 	}
 
 	if (KeyHit(Key_0)) { advanceInfo = !advanceInfo; }
@@ -401,14 +361,29 @@ void UpdateScene( float updateTime )
 			CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime);
 	}
 
-	ammoTimer -= updateTime;
-	if (ammoTimer <= 0.0f)
+	if (AmmoSpawn == true)
 	{
-		CVector3 randpos = { Random(0.0f, 50.0f), 5.0f, Random(0.0f, 50.0f) };
-		CVector3 rot = { 0.0f, 0.0f, 0.0f };
-		EntityManager.CreateAmmo("AmmoCrate", "Ammo" + ammoAmmount, randpos, rot , CVector3{ 0.2f, 0.2f, 0.1f });
-		ammoAmmount++;
-		ammoTimer = 2.0f;
+		ammoCount = 0;
+		EntityManager.BeginEnumEntities("", "", "Ammo");
+		CEntity* AmmoEntity = EntityManager.EnumEntity();
+		if (AmmoEntity != NULL)
+		{
+			if (AmmoEntity != 0)
+			{
+				ammoCount++;
+			}
+		}
+		if (ammoCount < 1)
+		{
+			ammoTimer -= updateTime;
+			if (ammoTimer <= 0.0f)
+			{
+				CVector3 randpos = { Random(-100.0f, 100.0f), 5.0f, Random(-100.0f, 100.0f) };
+				CVector3 rot = { 0.0f, 0.0f, 0.0f };
+				EntityManager.CreateAmmo("AmmoCrate", "Ammo", randpos, rot , CVector3{ 0.2f, 0.2f, 0.1f });
+				ammoTimer = 3.0f;
+			}
+		}
 	}
 }
 

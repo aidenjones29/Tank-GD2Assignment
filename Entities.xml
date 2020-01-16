@@ -14,34 +14,550 @@
     <!-- Other Types -->
     <EntityTemplate Type="Projectile" Name="Shell" Mesh="Bullet.x"/>
     <EntityTemplate Type="Ammo" Name="AmmoCrate" Mesh="Matchbox.x"/>
+    
+    <Tank Type="Tank" Name="Rogue Leader" Mesh="HoverTank04.x" Speed="20.0" Acceleration="2.2" 
+          TurnSpeed="2.0" TurTurnSpeed="1" HP="120" Damage="20"/>
+    
+    <Tank Type="Tank" Name="Rogue Scout" Mesh="HoverTank02.x" Speed="24.0" Acceleration="2.2"
+          TurnSpeed="2.0" TurTurnSpeed="1" HP="100" Damage="20"/>
 
+
+    <Tank Type="Tank" Name="Oberon MkII" Mesh="HoverTank08.x" Speed="18.0" Acceleration="1.6"
+          TurnSpeed="1.3" TurTurnSpeed="1" HP="120" Damage="35"/>
+
+    <Tank Type="Tank" Name="Oberon MkI" Mesh="HoverTank07.x" Speed="18.0" Acceleration="1.6"
+          TurnSpeed="1.3" TurTurnSpeed="1" HP="100" Damage="35"/>
+    
   </Templates>
   <!-- End of Entity Types -->
 
-  
   <!-- Scene Setup -->
   <Entities>
 
     <!-- Environment Positions -->
-    <Entity Type="Scenery" Name="Floor">
+    <Entity Type="Floor" Name="Floor">
       <Position X="0.0" Y="-0.04" Z="0.0"/>
       <Scale X="20.0" Y="20.0" Z="20.0"/>
     </Entity>
-    <Entity Type="Scenery" Name="Skybox">
+    <Entity Type="Skybox" Name="Skybox">
       <Position X="0.0" Y="-10000.0" Z="0.0"/>
       <Scale X="10.0" Y="10.0" Z="10.0"/>
     </Entity>
-    <Entity Type="Scenery" Name="Building">
+    <Entity Type="Building" Name="Building">
       <Position X="0.0" Y="0.0" Z="40.0"/>
     </Entity>
 
     <!-- Object Positions -->
-    <Entity Type="Scenery" Name="Tree">
-      <Position X="-200.0" Y="1200.0" Z="40.0">
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
         <Randomise X="30.0" Y="0.0" Z="150.0"/>
       </Position>
     </Entity>
 
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+
+    <Entity Type="Tree" Name="Tree1">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree2">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree3">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree4">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree5">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree6">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree7">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree8">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree9">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    <Entity Type="Tree" Name="Tree10">
+      <Position X="-100.0" Y="0.0" Z="40.0">
+        <Randomise X="30.0" Y="0.0" Z="150.0"/>
+      </Position>
+    </Entity>
+    
   </Entities>
   <!-- End of Scene Setup -->
 

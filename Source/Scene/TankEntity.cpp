@@ -88,7 +88,7 @@ namespace gen
 		m_Fired = 0;
 		m_Facing = false;
 		m_deadSpeed = 0.1f;
-		m_ammoCount = 10;
+		m_ammoCount = 2;
 	}
 
 
@@ -97,7 +97,7 @@ namespace gen
 	// Return false if the entity is to be destroyed
 	bool CTankEntity::Update(TFloat32 updateTime)
 	{
-		CEntity* tankE = EntityManager.GetEntity(GetUID());
+		//CEntity* tankE = EntityManager.GetEntity(GetUID());
 		// Fetch any messages
 		SMessage msg;
 		while (Messenger.FetchMessage(GetUID(), &msg))
@@ -113,8 +113,10 @@ namespace gen
 				break;
 			case Msg_Hit:
 				m_HP -= 20;
+				break;
 			case Msg_Ammo:
 				m_ammoCount = 10;
+				m_State = Patrol;
 				break;
 			}
 		}
@@ -220,21 +222,28 @@ namespace gen
 
 			if (m_Timer >= 0.0f && m_ammoCount >= 0)
 			{
-				CMatrix4x4 turretWorld = Matrix(2) * Matrix();
-				CEntity* tankTarget = EntityManager.GetEntity(m_Target);
-				CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
-				Normalise(turTurnVec);
-			
-				if (Dot(turretWorld.XAxis(), turTurnVec) > 0.0f)
+				if (EntityManager.GetEntity(m_Target))
 				{
-					Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
-				}
-				else if (Dot(turretWorld.XAxis(), turTurnVec) < -0.0f)
-				{
-					Matrix(2).RotateLocalY(-m_TankTemplate->GetTurretTurnSpeed() * updateTime);
-				}
+					CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+					CEntity* tankTarget = EntityManager.GetEntity(m_Target);
+					CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
+					Normalise(turTurnVec);
 			
-				m_Timer -= updateTime;
+					if (Dot(turretWorld.XAxis(), turTurnVec) > 0.0f)
+					{
+						Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
+					}
+					else if (Dot(turretWorld.XAxis(), turTurnVec) < -0.0f)
+					{
+						Matrix(2).RotateLocalY(-m_TankTemplate->GetTurretTurnSpeed() * updateTime);
+					}
+			
+					m_Timer -= updateTime;
+				}
+				else
+				{
+					m_State = Patrol;
+				}
 			}
 			else
 			{
@@ -245,8 +254,9 @@ namespace gen
 					CVector3 turRot;
 					CVector3 turScale;
 					turretWorld.DecomposeAffineEuler(&turPos, &turRot, NULL);
-					EntityManager.CreateShell("Shell Type 1", GetName(), turretWorld.Position(), turRot);
+					EntityManager.CreateShell("Shell", GetName(), turretWorld.Position(), turRot);
 					m_Fired++;
+					m_ammoCount--;
 				}
 			
 				CVector3 curPos = Matrix().Position();
@@ -258,7 +268,7 @@ namespace gen
 			}
 		}
 		else if (m_State == Evade)
-		{
+		{	
 			CVector3 tankPos = Matrix().GetPosition();
 
 			float distance = pointToPoint(tankPos, m_EvadePoint);
@@ -285,7 +295,6 @@ namespace gen
 						Matrix().RotateLocalY(-m_TankTemplate->GetTurnSpeed() * updateTime);
 					}
 				}
-				//m_Speed = 20.0f;
 				Matrix().MoveLocalZ(m_TankTemplate->GetMaxSpeed() * updateTime);
 			}
 			else
@@ -306,6 +315,7 @@ namespace gen
 		{
 			Matrix(2).RotateY(1.0f);
 			Matrix(2).MoveLocalY(m_deadSpeed);
+			Matrix().MoveLocalY(-m_deadSpeed);
 			if (Matrix(2).Position().y >= 6)
 			{
 				m_deadSpeed = -0.1f;
@@ -321,13 +331,37 @@ namespace gen
 
 			EntityManager.BeginEnumEntities("", "", "Ammo");
 			CEntity* AmmoEntity = EntityManager.EnumEntity();
-			if (AmmoEntity)
+			if (AmmoEntity != NULL)
 			{
-				while (AmmoEntity != 0)
+				if (AmmoEntity != 0)
 				{
-					
-					AmmoEntity = EntityManager.EnumEntity();
+					m_EvadePoint = AmmoEntity->Matrix().Position();
+					//AmmoEntity = EntityManager.EnumEntity();
 				}
+
+					CVector3 tankPos = Matrix().GetPosition();
+					float distance = pointToPoint(tankPos, m_EvadePoint);
+					if (distance >= 5.0f)
+					{
+						CVector3 turnVec = tankPos - m_EvadePoint;
+						CVector3 tankFacing = Matrix().ZAxis();
+						CVector3 tankXVec = Matrix().XAxis();
+
+						if (m_Facing == false)
+						{
+							if (Dot(tankXVec, turnVec) < 0)
+							{
+								Matrix().RotateLocalY(m_TankTemplate->GetTurnSpeed() * updateTime);
+							}
+							else if (Dot(tankXVec, turnVec) > 0)
+							{
+								Matrix().RotateLocalY(-m_TankTemplate->GetTurnSpeed() * updateTime);
+							}
+						}
+
+						Matrix().MoveLocalZ((m_TankTemplate->GetMaxSpeed() * updateTime));
+					}
+					Matrix().SetY(0.5f);
 			}
 			else
 			{
@@ -352,7 +386,7 @@ namespace gen
 	float pointToPoint(CVector3 pt1, CVector3 pt2)
 	{
 		CVector3 v = pt2 - pt1;
-		return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+		return sqrt((v.x * v.x) + (v.z * v.z));
 	}
 
 

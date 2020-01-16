@@ -76,7 +76,7 @@ void CParseLevel::StartElt( const string& eltName, SAttribute* attrs )
 void CParseLevel::EndElt( const string& eltName )
 {
 	// Close major file sections
-	if (eltName == "Templates" || eltName == "Entities")
+	if (eltName == "Templates" || eltName == "Entities" || eltName == "TankTemplate")
 	{
 		m_CurrentSection = None;
 	}
@@ -109,6 +109,20 @@ void CParseLevel::TemplatesStartElt( const string& eltName, SAttribute* attrs )
 		m_TemplateName = GetAttribute( attrs, "Name" );
 		m_TemplateMesh = GetAttribute( attrs, "Mesh" );
 		m_EntityManager->CreateTemplate( m_TemplateType, m_TemplateName, m_TemplateMesh );
+	}
+	else if (eltName == "Tank")
+	{
+		// Get attributes held in the tag
+		m_TemplateType = GetAttribute(attrs, "Type");
+		m_TemplateName = GetAttribute(attrs, "Name");
+		m_TemplateMesh = GetAttribute(attrs, "Mesh");
+		m_MaxSpeed = stof(GetAttribute(attrs, "Speed"));
+		m_Acceleration = stof(GetAttribute(attrs, "Acceleration"));
+		m_TurnSpeed = stof(GetAttribute(attrs, "TurnSpeed"));
+		m_TurTurnSpeed = stof(GetAttribute(attrs, "TurTurnSpeed"));
+		m_MaxHP = stof(GetAttribute(attrs, "HP"));
+		m_ShellDamage = stof(GetAttribute(attrs, "Damage"));
+		m_EntityManager->CreateTankTemplate(m_TemplateType, m_TemplateName, m_TemplateMesh, m_MaxSpeed, m_Acceleration, m_TurnSpeed, m_TurTurnSpeed, m_MaxHP, m_ShellDamage);
 	}
 }
 
