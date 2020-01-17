@@ -87,7 +87,7 @@ bool camset = false;
 CEntity* target1;
 CEntity* target2;
 CMatrix4x4 camPos;
-float ammoTimer = 3.0f;
+float ammoTimer = 5.0f;
 bool AmmoSpawn = false;
 int ammoCount = 0;
 
@@ -273,6 +273,7 @@ void RenderSceneText( float updateTime )
 			int X, Y;
 			if (MainCamera->PixelFromWorldPt(TankPt, ViewportWidth, ViewportHeight, &X, &Y))
 			{
+				//Sets colour to diferent team texts.
 				if (tankEntity->getTeam() == 0) { rgb = { 0.0f, 1.0f, 0.0f }; }
 				else if (tankEntity->getTeam() == 1) { rgb = { 1.0f, 0.0f, 0.0f }; }
 	
@@ -283,6 +284,7 @@ void RenderSceneText( float updateTime )
 				}
 				else
 				{
+					//Prints all tank info on the tank.
 					outText << tankEntity->Template()->GetName().c_str() << ": "
 						<< tankEntity->GetName().c_str() << endl << "HP: " << tankEntity->getHP() << " State: " << tankEntity->getState()
 						<< endl << "Fired: " << tankEntity->getFired() << " Ammo: " << tankEntity->getAmmo();
@@ -310,6 +312,7 @@ void UpdateScene( float updateTime )
 	if (KeyHit(Key_F2)) CameraMoveSpeed = 5.0f;
 	if (KeyHit(Key_F3)) CameraMoveSpeed = 40.0f;
 
+	//Start Game key
 	if (KeyHit(Key_1))
 	{
 		for (int i = 0; i < numTanks; i++)
@@ -319,9 +322,10 @@ void UpdateScene( float updateTime )
 			start.type = Msg_Start;
 			Messenger.SendMessage(Tanks[i], start);
 		}
-		AmmoSpawn = true;
+		AmmoSpawn = true; //Allows ammo to start spawning
 	}
 
+	//Sends stop message.
 	if (KeyHit(Key_2))
 	{
 		for (int i = 0; i < numTanks; i++)
@@ -337,10 +341,12 @@ void UpdateScene( float updateTime )
 	if (KeyHit(Key_0)) { advanceInfo = !advanceInfo; }
 	// Move the camera
 
+	//Chase cam controls
 	if (KeyHit(Key_Numpad1)) { tankCam = 0; }
 	if (KeyHit(Key_Numpad2)) { tankCam = 1; }
 	if (KeyHit(Key_Numpad3)) { tankCam = 2; }
 
+	//Chase camera settings.
 	if (tankCam == 1 && target1->GetName() == "A-1")
 	{
 		camPos = target1->Matrix();
@@ -361,6 +367,7 @@ void UpdateScene( float updateTime )
 			CameraMoveSpeed * updateTime, CameraRotSpeed * updateTime);
 	}
 
+	//Ammo crate spawning.
 	if (AmmoSpawn == true)
 	{
 		ammoCount = 0;
@@ -381,7 +388,7 @@ void UpdateScene( float updateTime )
 				CVector3 randpos = { Random(-100.0f, 100.0f), 5.0f, Random(-100.0f, 100.0f) };
 				CVector3 rot = { 0.0f, 0.0f, 0.0f };
 				EntityManager.CreateAmmo("AmmoCrate", "Ammo", randpos, rot , CVector3{ 0.2f, 0.2f, 0.1f });
-				ammoTimer = 3.0f;
+				ammoTimer = 5.0f;
 			}
 		}
 	}

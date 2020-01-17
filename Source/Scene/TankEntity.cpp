@@ -88,7 +88,7 @@ namespace gen
 		m_Fired = 0;
 		m_Facing = false;
 		m_deadSpeed = 0.1f;
-		m_ammoCount = 2;
+		m_ammoCount = 5;
 	}
 
 
@@ -115,7 +115,7 @@ namespace gen
 				m_HP -= 20;
 				break;
 			case Msg_Ammo:
-				m_ammoCount = 10;
+				m_ammoCount = 5;
 				m_State = Patrol;
 				break;
 			}
