@@ -124,6 +124,7 @@ private:
 	CEntity* m_Entity;
 	string   m_EntityType;
 	string   m_EntityName;
+	int      m_team;
 	CVector3 m_Pos;
 	CVector3 m_Rot;
 	CVector3 m_Scale;

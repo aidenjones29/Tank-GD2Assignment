@@ -1,35 +1,3 @@
-/*******************************************
-	TankEntity.cpp
-
-	Tank entity template and entity classes
-********************************************/
-
-// Additional technical notes for the assignment:
-// - Each tank has a team number (0 or 1), HP and other instance data - see the end of TankEntity.h
-//   You will need to add other instance data suitable for the assignment requirements
-
-// - A function GetTankUID is defined in TankAssignment.cpp and made available here, which returns
-//   the UID of the tank on a given team. This can be used to get the enemy tank UID
-
-// - Tanks have three parts: the root, the body and the turret. Each part has its own matrix, which
-//   can be accessed with the Matrix function - root: Matrix(), body: Matrix(1), turret: Matrix(2)
-//   However, the body and turret matrix are relative to the root's matrix - so to get the actual 
-//   world matrix of the body, for example, we must multiply: Matrix(1) * Matrix()
-
-// - Vector facing work similar to the car tag lab will be needed for the turret->enemy facing 
-//   requirements for the Patrol and Aim states
-// - The CMatrix4x4 function DecomposeAffineEuler allows you to extract the x,y & z rotations
-//   of a matrix. This can be used on the *relative* turret matrix to help in rotating it to face
-//   forwards in Evade state
-// - The CShellEntity class is simply an outline. To support shell firing, you will need to add
-//   member data to it and rewrite its constructor & update function. You will also need to update 
-//   the CreateShell function in EntityManager.cpp to pass any additional constructor data required
-// - Destroy an entity by returning false from its Update function - the entity manager wil perform
-//   the destruction. Don't try to call DestroyEntity from within the Update function.
-// - As entities can be destroyed, you must check that entity UIDs refer to existant entities, before
-//   using their entity pointers. The return value from EntityManager.GetEntity will be NULL if the
-//   entity no longer exists. Use this to avoid trying to target a tank that no longer exists etc.
-
 #include "TankEntity.h"
 #include "EntityManager.h"
 #include "Messenger.h"
@@ -74,21 +42,24 @@ namespace gen
 		// Tanks are on teams so they know who the enemy is
 		m_Team = team;
 		// Initialise other tank data and state
-		m_Speed = 0.0f;
-		m_HP = m_TankTemplate->GetMaxHP();
-		m_State = Inactive;
-		m_Timer = 1.0f;
+		m_Speed = 0.0f; //Current movement speed of the tanks.
+		m_HP = m_TankTemplate->GetMaxHP(); 
+		m_State = Inactive; //Starting state.
+		m_Timer = 1.0f; //Timer used for aiming time
+
+		//Initial patrol points set from each origin.
 		m_patrolPoint[0] = position;
 		m_patrolPoint[1] = position;
 		m_patrolPoint[0].z += Random(0, 30);
 		m_patrolPoint[1].z -= Random(0, 30);
 		m_patrolPoint[0].x += Random(0, 30);
 		m_patrolPoint[1].x -= Random(0, 30);
-		m_currentPoint = 1;
-		m_Fired = 0;
-		m_Facing = false;
-		m_deadSpeed = 0.1f;
-		m_ammoCount = 5;
+
+		m_currentPoint = 0; //Starting patrol point
+		m_Fired = 0; //Used for keeping track of shells fired.
+		m_Facing = false; //Am i facing the target? (Stops jittering)
+		m_deadSpeed = 0.1f; //Speed of dead "animation"
+		m_ammoCount = 5; //Max ammo.
 	}
 
 
@@ -131,21 +102,23 @@ namespace gen
 		if (m_State == Patrol)
 		{
 			CVector3 tankPos = Matrix().GetPosition();
-
+			Matrix().SetY(0.5f);
 			float distance = pointToPoint(tankPos, m_patrolPoint[m_currentPoint]);
 			CVector3 tankFacing = Matrix().ZAxis();
 			CVector3 turnVec = tankPos - m_patrolPoint[m_currentPoint];
 			
+			//Turns to face the target point.
 			if (Dot(Normalise(tankFacing), Normalise(turnVec)) < Cos(2.0f * updateTime))
 			{
 				CVector3 tankXVec = Matrix().XAxis();
 				if (Dot(tankXVec, turnVec) >= -0.5f && Dot(tankXVec, turnVec) <= 0.5f)
-				{
+				{   //Checks if facing to stop shaking.
 					m_Facing = true;
 				}
 			
 				if (m_Facing == false)
 				{
+					//is the target left or right.
 					if (Dot(tankXVec, turnVec) < 0)
 					{
 						Matrix().RotateLocalY(m_TankTemplate->GetTurnSpeed() * updateTime);
@@ -161,7 +134,7 @@ namespace gen
 			}
 			else if (distance <= 10.0f)
 			{
-				if (m_currentPoint == 1)
+				if (m_currentPoint == 1) //Changes patrol point.
 				{
 					m_currentPoint = 0;
 					m_Facing = false;
@@ -178,7 +151,7 @@ namespace gen
 			}
 			
 			
-			
+			//Turret rotation and enemy checking.
 			Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
 			
 			CMatrix4x4 turretWorld = Matrix(2) * Matrix();
@@ -192,6 +165,7 @@ namespace gen
 			EntityManager.BeginEnumEntities("", "", "Tank");
 			CEntity* tankEntity = EntityManager.EnumEntity();
 			
+			//Checks all tanks for being within a cone of the turret.
 			while (tankEntity != 0)
 			{
 				CTankEntity* tank = static_cast<CTankEntity*>(tankEntity);
@@ -219,7 +193,7 @@ namespace gen
 		}
 		else if (m_State == Aim)
 		{
-
+			//Follows the target tank and fires.
 			if (m_Timer >= 0.0f && m_ammoCount >= 0)
 			{
 				if (EntityManager.GetEntity(m_Target))
@@ -249,6 +223,7 @@ namespace gen
 			{
 				if (m_ammoCount >= 0)
 				{
+					//Creation of a shell with the turrets orientation.
 					CMatrix4x4 turretWorld = Matrix(2) * Matrix();
 					CVector3 turPos;
 					CVector3 turRot;
@@ -258,11 +233,13 @@ namespace gen
 					m_Fired++;
 					m_ammoCount--;
 				}
-			
+				
+				//Sets an evade point at random for evade state.
 				CVector3 curPos = Matrix().Position();
 				curPos.x += Random(-40.0f, 40.0f);
 				curPos.z += Random(-40.0f, 40.0f);
 				m_EvadePoint = curPos;
+				//If the tank has no ammo sets to ammo state.
 				if (m_ammoCount >= 0) { m_State = Evade; }
 				else { m_State = Ammo; }
 			}
@@ -270,9 +247,10 @@ namespace gen
 		else if (m_State == Evade)
 		{	
 			CVector3 tankPos = Matrix().GetPosition();
-
+			Matrix().SetY(0.5f);
 			float distance = pointToPoint(tankPos, m_EvadePoint);
 
+			//If target point is far away face it.
 			if (distance >= 10.0f)
 			{
 				CVector3 turnVec = tankPos - m_EvadePoint;
@@ -296,10 +274,26 @@ namespace gen
 					}
 				}
 				Matrix().MoveLocalZ(m_TankTemplate->GetMaxSpeed() * updateTime);
+
+				//Rotates the turrt to the facing vector of the tank to face forward.
+				CMatrix4x4 turretWorld = Matrix(2) * Matrix();
+				CEntity* tankTarget = EntityManager.GetEntity(GetUID());
+				CVector3 turTurnVec = tankTarget->Position() - turretWorld.Position();
+				Normalise(turTurnVec);
+
+				if (Dot(turretWorld.XAxis(), turTurnVec) > 0.0f)
+				{
+					Matrix(2).RotateLocalY(m_TankTemplate->GetTurretTurnSpeed() * updateTime);
+				}
+				else if (Dot(turretWorld.XAxis(), turTurnVec) < -0.0f)
+				{
+					Matrix(2).RotateLocalY(-m_TankTemplate->GetTurretTurnSpeed() * updateTime);
+				}
 			}
 			else
 			{
-				if (m_ammoCount <= 0)
+				//Loops ammo and evade state if no ammo found.
+				if (m_ammoCount <= 0) 
 				{
 					m_State = Ammo;
 					m_Facing = false;
@@ -313,32 +307,32 @@ namespace gen
 		}
 		else if (m_State == Dead)
 		{
+			//Preforms the death animation.
 			Matrix(2).RotateY(1.0f);
 			Matrix(2).MoveLocalY(m_deadSpeed);
-			Matrix().MoveLocalY(-m_deadSpeed);
 			if (Matrix(2).Position().y >= 6)
 			{
 				m_deadSpeed = -0.1f;
 			}
 			if (Matrix(2).Position().y <= 0)
 			{
-				return false;
+				return false; //Destorys the tank.
 			}
 
 		}
 		else if (m_State == Ammo)
 		{
-
+			//Find ammo crate if one spawned.
 			EntityManager.BeginEnumEntities("", "", "Ammo");
 			CEntity* AmmoEntity = EntityManager.EnumEntity();
 			if (AmmoEntity != NULL)
 			{
+				//Uses evade point to move for ammo.
 				if (AmmoEntity != 0)
 				{
 					m_EvadePoint = AmmoEntity->Matrix().Position();
-					//AmmoEntity = EntityManager.EnumEntity();
 				}
-
+					
 					CVector3 tankPos = Matrix().GetPosition();
 					float distance = pointToPoint(tankPos, m_EvadePoint);
 					if (distance >= 5.0f)
@@ -365,6 +359,7 @@ namespace gen
 			}
 			else
 			{
+				//If no ammo available go back to evade with a new random pos
 				CVector3 curPos = Matrix().Position();
 				curPos.x += Random(-40.0f, 40.0f);
 				curPos.z += Random(-40.0f, 40.0f);

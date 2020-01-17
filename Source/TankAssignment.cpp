@@ -106,23 +106,6 @@ bool SceneSetup()
 	//LOAD XML file templates
 	LevelParser.ParseFile("Entities.xml");
 
-	////////////////////////////////
-	// Create tank entities
-
-	// Type (template name), team number, tank name, position, rotation
-	Tanks[0] = EntityManager.CreateTank("Rogue Leader", 0, "A-1", CVector3(-30.0f, 0.5f, -20.0f),
-		CVector3(0.0f, ToRadians(90.0f), 0.0f));
-	Tanks[2] = EntityManager.CreateTank("Rogue Scout", 0, "A-2", CVector3(-40.0f, 0.5f, -30.0f),
-		CVector3(0.0f, ToRadians(90.0f), 0.0f));
-	Tanks[3] = EntityManager.CreateTank("Rogue Scout", 0, "A-3", CVector3(-40.0f, 0.5f, -10.0f),
-		CVector3(0.0f, ToRadians(90.0f), 0.0f));
-	Tanks[1] = EntityManager.CreateTank("Oberon MkII", 1, "B-1", CVector3(50.0f, 0.5f, 20.0f),
-		CVector3(0.0f, ToRadians(270.0f), 0.0f));
-	Tanks[4] = EntityManager.CreateTank("Oberon MkI", 1, "B-2", CVector3(60.0f, 0.5f, 30.0f),
-		CVector3(0.0f, ToRadians(270.0f), 0.0f));
-	Tanks[5] = EntityManager.CreateTank("Oberon MkI", 1, "B-3", CVector3(60.0f, 0.5f, 10.0f),
-		CVector3(0.0f, ToRadians(270.0f), 0.0f));
-
 	/////////////////////////////
 	// Camera / light setup
 
@@ -137,8 +120,8 @@ bool SceneSetup()
 	// Ambient light level
 	AmbientLight = SColourRGBA(0.6f, 0.6f, 0.6f, 1.0f);
 
-	target1 = EntityManager.GetEntity("A-1");
-	target2 = EntityManager.GetEntity("B-1");
+	target1 = EntityManager.GetEntity("R-1");
+	target2 = EntityManager.GetEntity("O-1");
 	return true;
 }
 
@@ -258,16 +241,17 @@ void RenderSceneText( float updateTime )
 		outText.str("");
 	}
 
+	EntityManager.BeginEnumEntities("", "", "Tank");
+	CEntity* tankEntity = EntityManager.EnumEntity();
 
-	for (int i = 0; i < numTanks; ++i)
+	while (tankEntity != 0)
 	{
-		// Get monster entity (ensure it exists), then its world position
-		CEntity* entity = EntityManager.GetEntity(Tanks[i]);
+		CEntity* entity = tankEntity;
 		if (entity)
 		{
 			CTankEntity* tankEntity = static_cast<CTankEntity*>(entity);
 			CVector3 TankPt = tankEntity->Position();
-	
+
 			CVector3 rgb = { 0.0f, 0.0f, 0.0f };
 			// Convert monster world position to pixel coordinate (picking in Camera class)
 			int X, Y;
@@ -276,7 +260,7 @@ void RenderSceneText( float updateTime )
 				//Sets colour to diferent team texts.
 				if (tankEntity->getTeam() == 0) { rgb = { 0.0f, 1.0f, 0.0f }; }
 				else if (tankEntity->getTeam() == 1) { rgb = { 1.0f, 0.0f, 0.0f }; }
-	
+
 				if (advanceInfo == false)
 				{
 					outText << tankEntity->Template()->GetName().c_str() << ": "
@@ -289,15 +273,16 @@ void RenderSceneText( float updateTime )
 						<< tankEntity->GetName().c_str() << endl << "HP: " << tankEntity->getHP() << " State: " << tankEntity->getState()
 						<< endl << "Fired: " << tankEntity->getFired() << " Ammo: " << tankEntity->getAmmo();
 				}
-	
+
 				RenderText(outText.str(), X, Y, rgb.x, rgb.y, rgb.z, true);
-	
+
 				outText.str("");
 			}
 		}
+
+		tankEntity = EntityManager.EnumEntity();
 	}
 	outText.str("");
-
 }
 
 
@@ -315,12 +300,19 @@ void UpdateScene( float updateTime )
 	//Start Game key
 	if (KeyHit(Key_1))
 	{
-		for (int i = 0; i < numTanks; i++)
+		EntityManager.BeginEnumEntities("", "", "Tank");
+		CEntity* tankEntityStart = EntityManager.EnumEntity();
+
+		while (tankEntityStart != 0)
 		{
-			SMessage start;
-			start.from = SystemUID;
-			start.type = Msg_Start;
-			Messenger.SendMessage(Tanks[i], start);
+			if (tankEntityStart)
+			{
+				SMessage start;
+				start.from = SystemUID;
+				start.type = Msg_Start;
+				Messenger.SendMessage(tankEntityStart->GetUID(), start);
+			}
+			tankEntityStart = EntityManager.EnumEntity();
 		}
 		AmmoSpawn = true; //Allows ammo to start spawning
 	}
@@ -328,14 +320,21 @@ void UpdateScene( float updateTime )
 	//Sends stop message.
 	if (KeyHit(Key_2))
 	{
-		for (int i = 0; i < numTanks; i++)
+		EntityManager.BeginEnumEntities("", "", "Tank");
+		CEntity* tankEntityStop = EntityManager.EnumEntity();
+
+		while (tankEntityStop != 0)
 		{
-			SMessage start;
-			start.from = SystemUID;
-			start.type = Msg_Stop;
-			Messenger.SendMessage(Tanks[i], start);
+			if (tankEntityStop)
+			{
+				SMessage stop;
+				stop.from = SystemUID;
+				stop.type = Msg_Stop;
+				Messenger.SendMessage(tankEntityStop->GetUID(), stop);
+			}
+			tankEntityStop = EntityManager.EnumEntity();
 		}
-		AmmoSpawn = false;
+		AmmoSpawn = false; //Allows ammo to start spawning
 	}
 
 	if (KeyHit(Key_0)) { advanceInfo = !advanceInfo; }
@@ -347,14 +346,14 @@ void UpdateScene( float updateTime )
 	if (KeyHit(Key_Numpad3)) { tankCam = 2; }
 
 	//Chase camera settings.
-	if (tankCam == 1 && target1->GetName() == "A-1")
+	if (tankCam == 1 && target1->GetName() == "R-1")
 	{
 		camPos = target1->Matrix();
 		camPos.Position().y += 4.0f;
 		camPos.MoveLocalZ(-15);
 		MainCamera->Matrix() = camPos;
 	}
-	else if (tankCam == 2 && target2->GetName() == "B-1")
+	else if (tankCam == 2 && target2->GetName() == "O-1")
 	{
 		camPos = target2->Matrix();
 		camPos.Position().y += 4.0f;
@@ -385,7 +384,7 @@ void UpdateScene( float updateTime )
 			ammoTimer -= updateTime;
 			if (ammoTimer <= 0.0f)
 			{
-				CVector3 randpos = { Random(-100.0f, 100.0f), 5.0f, Random(-100.0f, 100.0f) };
+				CVector3 randpos = { Random(-100.0f, 100.0f), 20.0f, Random(-100.0f, 100.0f) };
 				CVector3 rot = { 0.0f, 0.0f, 0.0f };
 				EntityManager.CreateAmmo("AmmoCrate", "Ammo", randpos, rot , CVector3{ 0.2f, 0.2f, 0.1f });
 				ammoTimer = 5.0f;

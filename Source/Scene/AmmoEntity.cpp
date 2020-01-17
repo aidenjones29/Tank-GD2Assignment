@@ -50,6 +50,11 @@ namespace gen
 	{
 		Matrix().RotateLocalY(1.0f * updateTime);
 
+		if (Matrix().GetY() >= 5)
+		{
+			Matrix().MoveY(-2.0f * updateTime);
+		}
+
 		EntityManager.BeginEnumEntities("", "", "Tank");
 		CEntity* tankEntity = EntityManager.EnumEntity();
 		while (tankEntity != 0)

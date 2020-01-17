@@ -19,14 +19,14 @@
           TurnSpeed="2.0" TurTurnSpeed="1" HP="120" Damage="20"/>
     
     <Tank Type="Tank" Name="Rogue Scout" Mesh="HoverTank02.x" Speed="24.0" Acceleration="2.2"
-          TurnSpeed="2.0" TurTurnSpeed="1" HP="100" Damage="20"/>
+          TurnSpeed="2.0" TurTurnSpeed="1.2" HP="100" Damage="20"/>
 
 
     <Tank Type="Tank" Name="Oberon MkII" Mesh="HoverTank08.x" Speed="18.0" Acceleration="1.6"
-          TurnSpeed="1.3" TurTurnSpeed="1" HP="120" Damage="35"/>
+          TurnSpeed="1.3" TurTurnSpeed="1" HP="140" Damage="35"/>
 
     <Tank Type="Tank" Name="Oberon MkI" Mesh="HoverTank07.x" Speed="20.0" Acceleration="1.6"
-          TurnSpeed="1.3" TurTurnSpeed="1" HP="100" Damage="35"/>
+          TurnSpeed="1.3" TurTurnSpeed="1.2" HP="120" Damage="35"/>
     
   </Templates>
   <!-- End of Entity Types -->
@@ -34,6 +34,36 @@
   <!-- Scene Setup -->
   <Entities>
 
+    <Tank Template="Rogue Leader" Team="0" Name="R-1">
+      <Position X="-30.0" Y="0.5" Z="-20.0"/>
+      <Rotation X="0.0" Y="90.0" Z="0.0"/>
+    </Tank>
+
+    <Tank Template="Rogue Scout" Team="0" Name="R-2">
+      <Position X="-40.0" Y="0.5" Z="-30.0"/>
+      <Rotation X="0.0" Y="90.0" Z="0.0"/>
+    </Tank>
+
+    <Tank Template="Rogue Scout" Team="0" Name="R-3">
+      <Position X="-40.0" Y="0.5" Z="-10.0"/>
+      <Rotation X="0.0" Y="90.0" Z="0.0"/>
+    </Tank>
+
+    <Tank Template="Oberon MkII" Team="1" Name="O-1">
+      <Position X="50.0" Y="0.5" Z="20.0"/>
+      <Rotation X="0.0" Y="270.0" Z="0.0"/>
+    </Tank>
+
+    <Tank Template="Oberon MkI" Team="1" Name="O-2">
+      <Position X="60.0" Y="0.5" Z="30.0"/>
+      <Rotation X="0.0" Y="270.0" Z="0.0"/>
+    </Tank>
+
+    <Tank Template="Oberon MkI" Team="1" Name="O-3">
+      <Position X="60.0" Y="0.5" Z="10.0"/>
+      <Rotation X="0.0" Y="270.0" Z="0.0"/>
+    </Tank>
+          
     <!-- Environment Positions -->
     <Entity Type="Floor" Name="Floor">
       <Position X="0.0" Y="-0.04" Z="0.0"/>

@@ -152,6 +152,24 @@ void CParseLevel::EntitiesStartElt( const string& eltName, SAttribute* attrs )
 		m_Scale = CVector3(1.0f, 1.0f, 1.0f);
 	}
 
+	if (eltName == "Tank")
+	{
+		m_EntityType = GetAttribute(attrs, "Template");
+		m_EntityName = GetAttribute(attrs, "Name");
+		m_team = stoi(GetAttribute(attrs, "Team"));
+
+		// Create a new entity - add components during parsing and initialise position on closing tag
+		TEntityUID entityUID = m_EntityManager->CreateTank(m_EntityType, m_team, m_EntityName, m_Pos, m_Rot, m_Scale);
+		m_Entity = m_EntityManager->GetEntity(entityUID);
+
+		// Set default positions
+		m_Pos = CVector3::kOrigin;
+		m_Rot = CVector3::kOrigin;
+		m_Scale = CVector3(1.0f, 1.0f, 1.0f);
+	}
+
+
+
 	// Started reading an entity position - get X,Y,Z
 	else if (eltName == "Position")
 	{
@@ -201,7 +219,7 @@ void CParseLevel::EntitiesStartElt( const string& eltName, SAttribute* attrs )
 void CParseLevel::EntitiesEndElt( const string& eltName )
 {
 	// Finished reading entity - set its position
-	if (eltName == "Entity")
+	if (eltName == "Entity" || eltName == "Tank")
 	{
 		m_Entity->Matrix().MakeAffineEuler( m_Pos, m_Rot, kZXY, m_Scale );
 	}
